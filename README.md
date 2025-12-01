@@ -4,50 +4,88 @@
 
 # Snowflake MCP Server Setup
 
-> **DEMONSTRATION PROJECT - EXPIRES: 2025-12-24**
-> This demo uses Snowflake features current as of November 2025.
+> **DEMONSTRATION PROJECT - EXPIRES: 2025-12-24**  
+> This demo uses Snowflake features current as of November 2025.  
 > After expiration, this repository will be archived and made private.
 
-**Author:** SE Community
-**Purpose:** Reference implementation for MCP server setup
+**Author:** SE Community  
+**Purpose:** Reference implementation for MCP server setup  
 **Created:** 2025-11-24 | **Expires:** 2025-12-24 (30 days) | **Status:** ACTIVE
 
 ---
 
-**ONE secure approach. THREE simple steps. FIVE minutes.**
+## What This Provides
 
-This repository provides a production-ready SQL script to provision a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that exposes Snowflake's documentation via Cortex Search to AI coding assistants like **Cursor**, **Claude Desktop**, **VS Code**, and other MCP-compatible IDEs.
+A production-ready, security-focused implementation to expose Snowflake's documentation through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) to AI coding assistants like **Cursor**, **Claude Desktop**, **VS Code**, and other MCP-compatible IDEs.
+
+**Key Features:**
+- ✅ **Minimal privilege security model** - Dedicated role with only required grants
+- ✅ **Copy-paste deployment** - Run SQL scripts directly in Snowsight
+- ✅ **Extensible architecture** - Templates and config files for easy customization
+- ✅ **Cross-platform tooling** - Automated workflows for Unix/macOS and Windows
+- ✅ **Complete documentation** - Every file justified with clear guidance
 
 ---
 
-## First Time Here?
+## 👋 First Time Here?
 
 Follow these steps in order:
 
-1. `docs/01-SETUP.md` — Prerequisites and Snowflake preparation (5 min)
-2. `sql/01_setup/create_token.sql` — Generate PAT token in Snowsight (1 min)
-3. `sql/01_setup/setup_mcp.sql` — Provision MCP server (2 min)
-4. Configure your IDE — Add MCP URL + token to IDE config (5 min)
-5. `docs/02-SECURITY.md` — Review security model and authentication (5 min)
-6. `docs/03-TROUBLESHOOTING.md` — Reference for diagnostics (keep handy)
-7. `docs/04-CUSTOM-TOOLS.md` — Learn about custom tools (2 min)
+1. **[Prerequisites & Setup](docs/01-SETUP.md)** — Prepare your environment (5 min)
+2. **[Create Token](sql/01_setup/create_token.sql)** — Generate PAT token in Snowsight (1 min)
+3. **[Setup MCP Server](sql/01_setup/setup_mcp.sql)** — Provision infrastructure (2 min)
+4. **Configure IDE** — Add MCP URL + token to your IDE config (5 min)
+5. **[Security Review](docs/02-SECURITY.md)** — Understand the security model (5 min)
+6. **[Troubleshooting](docs/03-TROUBLESHOOTING.md)** — Keep handy for diagnostics
+7. **[Custom Tools Guide](docs/04-CUSTOM-TOOLS.md)** — Learn extensibility patterns (2 min)
 
-**Alternative (Automated):** Run `tools/00_master.sh --profile <PROFILE>` (Unix) or `tools\00_master.bat --profile <PROFILE>` (Windows) to automate steps 2-3.
+**🚀 Alternative (Automated):** Run `tools/00_master.sh --profile <PROFILE>` (Unix/macOS) or `tools\00_master.bat --profile <PROFILE>` (Windows) to automate steps 2-3.
 
-**Total setup time:** ~20 minutes
+**⏱️ Total setup time:** ~20 minutes
 
 ---
 
-## Quick Start
+## 🎨 Customization
+
+This project is designed to be easily customized for your environment:
+
+### Configuration Files (✅ Safe to Edit)
+
+- **[`config/settings.yaml`](config/settings.yaml)** - Database names, roles, warehouses, token settings
+- **[`config/mcp_spec.yaml`](config/mcp_spec.yaml)** - MCP tool definitions (add, remove, or modify tools)
+
+### Adding Custom Tools
+
+1. **Copy a template:**
+   - For UDFs: [`sql/02_custom_tools/_TEMPLATE.sql`](sql/02_custom_tools/_TEMPLATE.sql)
+   - For semantic views: [`sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql`](sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql)
+
+2. **Implement your function** in the copied SQL file
+
+3. **Add tool definition** to [`config/mcp_spec.yaml`](config/mcp_spec.yaml)
+
+4. **Run your SQL file** to create the function
+
+5. **Re-run** [`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql) to update the MCP server
+
+See **[Custom Tools Guide](docs/04-CUSTOM-TOOLS.md)** for detailed instructions and examples.
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Snowflake account with `ACCOUNTADMIN`, `SYSADMIN`, and `SECURITYADMIN` roles
-- Snowflake Marketplace access (for accepting documentation share)
-- Snowflake CLI (`snow`) 2.5.0+ configured with the roles above
-- Python 3.10+ with dependencies installed via `pip install -r python/requirements.txt`
-- MCP-compatible IDE: **Cursor**, **Claude Desktop**, **VS Code** (with Continue.dev), **Zed**, or [others](https://modelcontextprotocol.io/implementations)
 
-Install the Python dependencies before running any tooling:
+**Snowflake Account:**
+- Roles: `ACCOUNTADMIN`, `SYSADMIN`, and `SECURITYADMIN`
+- Snowflake Marketplace access (for documentation share)
+
+**Local Tools:**
+- **Snowflake CLI (`snow`)** version 2.5.0+ configured with above roles
+- **Python 3.10+** for automation scripts (optional - can run SQL manually)
+- **MCP-compatible IDE:** [Cursor](https://cursor.sh/), [Claude Desktop](https://claude.ai/download), [VS Code](https://code.visualstudio.com/) (with [Continue.dev](https://continue.dev/)), [Zed](https://zed.dev/), or [other MCP clients](https://modelcontextprotocol.io/implementations)
+
+**Python Setup (if using automation tools):**
 
 ```bash
 python3 -m venv .venv
@@ -59,32 +97,46 @@ pip install -r python/requirements.txt
 
 ### **Step 1: Create Token**
 
-Open [`sql/01_setup/create_token.sql`](sql/01_setup/create_token.sql) in Snowsight.
+Open **[`sql/01_setup/create_token.sql`](sql/01_setup/create_token.sql)** in Snowsight.
 
-1. Click "Run All"
-2. Look for the result with "TOKEN_SECRET" column
+1. Click **"Run All"**
+2. Look for the result with **"TOKEN_SECRET"** column
 3. **IMMEDIATELY copy the TOKEN_SECRET** value (starts with `eyJ...`)
 4. **Save it in your password manager** (you'll never see it again!)
 
-CLI alternative: `tools/01_create_token.sh --profile <SNOWFLAKE_PROFILE>` (or the `.bat` equivalent) runs the same SQL through the Snow CLI.
+**CLI Alternative:**
+```bash
+# Unix/macOS
+./tools/01_create_token.sh --profile <SNOWFLAKE_PROFILE>
 
-### **Step 2: Setup MCP**
+# Windows
+tools\01_create_token.bat --profile <SNOWFLAKE_PROFILE>
+```
 
-Open [`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql) in Snowsight.
+### **Step 2: Setup MCP Server**
 
-1. Click "Run All"
-2. Look for the result with "mcp_url" column
+Open **[`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql)** in Snowsight.
+
+1. Click **"Run All"**
+2. Look for the result with **"mcp_url"** column
 3. **Copy the mcp_url** value
 
 **What this script does:**
-- Creates MCP server infrastructure (if it doesn't exist)
-- Creates `MCP_ACCESS_ROLE` with 4 minimal privileges
-- Grants role to your user
-- Displays your account-specific MCP server URL
+- ✅ Creates MCP server infrastructure (if it doesn't exist)
+- ✅ Creates `MCP_ACCESS_ROLE` with 5 minimal privileges
+- ✅ Grants role to your user
+- ✅ Displays your account-specific MCP server URL
 
 **Script is idempotent** - safe to run multiple times.
 
-CLI alternative: `tools/02_setup_mcp.sh --profile <SNOWFLAKE_PROFILE>` (or the `.bat` equivalent) runs the same SQL through the Snow CLI.
+**CLI Alternative:**
+```bash
+# Unix/macOS
+./tools/02_setup_mcp.sh --profile <SNOWFLAKE_PROFILE>
+
+# Windows
+tools\02_setup_mcp.bat --profile <SNOWFLAKE_PROFILE>
+```
 
 ---
 
@@ -220,73 +272,93 @@ Any IDE that supports the [Model Context Protocol](https://modelcontextprotocol.
 
 **Test from command line:**
 ```bash
+# Unix/macOS
 ./tools/03_test_connection.sh \
-  --url "https://<org>-<account>.snowflakecomputing.com/api/v2/databases/..." \
-  --hostname "<org>-<account>.snowflakecomputing.com"
+  --url "YOUR_MCP_URL_FROM_STEP_2" \
+  --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
+
+# Windows
+tools\03_test_connection.bat --url "YOUR_MCP_URL_FROM_STEP_2" --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
 ```
 
-Windows: `tools\03_test_connection.bat --url "https://<org>-<account>.snowflakecomputing.com/api/v2/databases/..." --hostname "<org>-<account>.snowflakecomputing.com"`
-
-Expected output: `MCP Server: Ready and responding`
+**Expected output:** `MCP Server: Ready and responding`
 
 The verification script prints a JSON summary showing SSL status, HTTP status, and any errors for easy logging.
 
 **Restart your IDE** (Cmd+Q / Alt+F4 and reopen)
 
 **Test with questions:**
+```
 > "How do I create a dynamic table in Snowflake?"
 > "What Snowflake account am I connected to?"
 > "Find functions for working with JSON data"
+```
 
 The assistant should call the MCP server and return documentation-based answers or tool results.
 
 ---
 
-## Custom Tools Demonstration
+## 🛠️ Custom Tools Demonstration
 
-Beyond documentation search, this project includes two custom tools that demonstrate the extensibility of Snowflake's MCP server:
+Beyond documentation search, this project includes two custom tools that demonstrate extensibility:
 
-1. **Get Account Info** - Returns your current Snowflake environment details (version, region, account name, etc.)
-2. **Find Snowflake Functions** - Searches for built-in functions by keyword to complement the general doc search
+1. **Get Account Info** - Returns your Snowflake environment details (version, region, account name, etc.)
+2. **Find Snowflake Functions** - Searches for built-in functions by keyword
 
-Try asking:
+**Try asking:**
+```
 > "What Snowflake account am I connected to?"
 > "Find functions for working with JSON data"
 > "Search for date manipulation functions"
+```
 
-These tools showcase how you can extend the MCP server with custom UDFs and stored procedures to add domain-specific capabilities.
+These tools showcase how you can extend the MCP server with custom UDFs and stored procedures.
 
-See [`docs/04-CUSTOM-TOOLS.md`](docs/04-CUSTOM-TOOLS.md) for details on these tools and how to add your own.
+### Adding Your Own Tools
+
+This project provides templates and configuration to make adding custom tools straightforward:
+
+| Template | Purpose | Link |
+|----------|---------|------|
+| **Generic UDF Template** | Copy-paste starting point for custom functions | [`sql/02_custom_tools/_TEMPLATE.sql`](sql/02_custom_tools/_TEMPLATE.sql) |
+| **Semantic View Template** | Template for Cortex Analyst integration | [`sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql`](sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql) |
+| **Tool Configuration** | Add tool definitions (includes commented template) | [`config/mcp_spec.yaml`](config/mcp_spec.yaml) |
+
+**📚 Complete Guide:** See **[Custom Tools Documentation](docs/04-CUSTOM-TOOLS.md)** for step-by-step instructions.
 
 ---
 
-## Authentication Note
+## 🔐 Authentication Note
 
 This demo uses **Programmatic Access Tokens (PAT)** for simplicity. PAT tokens are perfect for demos, development, and learning environments.
 
 For production deployments, Snowflake recommends **OAuth 2.0**. The MCP server architecture supports both authentication methods - we chose PAT to minimize setup friction while demonstrating best-practice security patterns (dedicated role, minimal privileges, clear audit trail).
 
-See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for a detailed comparison and OAuth setup guidance.
+**📚 Learn More:** See **[Security Documentation](docs/02-SECURITY.md)** for a detailed comparison and OAuth setup guidance.
 
 ---
 
-## Security: Minimal Privileges
+## 🔒 Security: Minimal Privileges
 
 The `MCP_ACCESS_ROLE` has **minimal grants** and nothing more:
 
-1. `USAGE` on `SNOWFLAKE_INTELLIGENCE` database
-2. `USAGE` on `SNOWFLAKE_INTELLIGENCE.MCP` schema
-3. `USAGE` on the MCP server object
-4. `USAGE` on custom tool functions (account info, function finder)
-5. `IMPORTED PRIVILEGES` on `SNOWFLAKE_DOCUMENTATION` (marketplace database)
+| Grant | Purpose |
+|-------|---------|
+| `USAGE` on `SNOWFLAKE_INTELLIGENCE` database | Access MCP infrastructure |
+| `USAGE` on `SNOWFLAKE_INTELLIGENCE.MCP` schema | Access MCP objects |
+| `USAGE` on the MCP server object | Call MCP endpoints |
+| `USAGE` on custom tool functions | Execute demo tools |
+| `IMPORTED PRIVILEGES` on `SNOWFLAKE_DOCUMENTATION` | Search documentation |
 
-**If a PAT token is compromised**, an attacker can only:
+### If a PAT Token is Compromised
+
+**✅ Attacker CAN:**
 - Call MCP server endpoints
 - Search Snowflake documentation
 - View account metadata (version, region, account name)
 - Search for function names in documentation
 
-An attacker cannot:
+**❌ Attacker CANNOT:**
 - Access user databases or tables
 - Read schemas outside of the documentation share
 - Create, modify, or delete objects
@@ -294,7 +366,7 @@ An attacker cannot:
 
 **Blast radius: minimal** — access is limited to documentation search
 
-See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for detailed analysis.
+**📚 Learn More:** See **[Security Documentation](docs/02-SECURITY.md)** for detailed analysis.
 
 ---
 
@@ -302,7 +374,14 @@ See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for detailed analysis.
 
 ```
 .
-├── diagrams/                   # Mandatory Mermaid architecture diagrams
+├── .secrets/                   # Gitignored - local token storage
+│   ├── README.md              # Usage instructions
+│   ├── mcp.json.example       # Template for IDE config
+│   └── .gitkeep
+├── config/                     # ✅ CUSTOMIZE THESE FILES
+│   ├── settings.yaml          # Database names, roles, warehouses
+│   └── mcp_spec.yaml          # MCP tool definitions
+├── diagrams/                   # Mermaid architecture diagrams
 │   ├── auth-flow.md
 │   ├── data-flow.md
 │   └── network-flow.md
@@ -311,7 +390,7 @@ See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for detailed analysis.
 │   ├── 02-SECURITY.md
 │   ├── 03-TROUBLESHOOTING.md
 │   └── 04-CUSTOM-TOOLS.md
-├── python/                     # Shared CLI logic, services, and tests
+├── python/                     # CLI logic, services, and tests
 │   ├── cli/
 │   │   └── main.py
 │   ├── services/
@@ -325,8 +404,10 @@ See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for detailed analysis.
 ├── sql/                        # Snowflake automation
 │   ├── 01_setup/
 │   │   ├── create_token.sql
-│   │   └── setup_mcp.sql
+│   │   └── setup_mcp.sql      # Now uses config/ variables
 │   ├── 02_custom_tools/
+│   │   ├── _TEMPLATE.sql      # 📋 COPY to create new tools
+│   │   ├── SEMANTIC_VIEWS_TEMPLATE.sql  # 📋 COPY for Cortex Analyst
 │   │   ├── account_info.sql
 │   │   └── function_finder.sql
 │   ├── 03_operations/
@@ -343,43 +424,38 @@ See [`docs/02-SECURITY.md`](docs/02-SECURITY.md) for detailed analysis.
 │   ├── 03_test_connection.sh
 │   └── 03_test_connection.bat
 ├── README.md                   # Main documentation
-├── QUICKSTART.md               # Sequential onboarding (created from docs)
-├── LICENSE
-└── .cursor/
-    └── docs/
-        └── CHANGELOG.md
+├── QUICKSTART.md               # Sequential onboarding
+└── LICENSE
+
+Legend: ✅ = Customize for your environment | 📋 = Copy and modify template
 ```
 
 ---
 
-## Cleanup
+## 🧹 Cleanup
 
 To remove MCP server, custom tools, and role (preserves reusable infrastructure):
 
-```sql
--- Execute sql/99_cleanup/teardown_all.sql in Snowsight
--- Removes:
---   - Custom functions (GET_ACCOUNT_INFO, FIND_SNOWFLAKE_FUNCTIONS)
---   - MCP server (SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER)
---   - MCP_ACCESS_ROLE and all grants
--- Preserves:
---   - SNOWFLAKE_INTELLIGENCE database and schemas (reusable)
---   - SNOWFLAKE_DOCUMENTATION database (may be used by other examples)
---   - PAT tokens (user-managed, may be used elsewhere)
-```
+**Execute [`sql/99_cleanup/teardown_all.sql`](sql/99_cleanup/teardown_all.sql) in Snowsight**
 
-**Objects removed:**
-- Custom tool functions
-- MCP server object
-- `MCP_ACCESS_ROLE` (automatically revoked from users)
+### What Gets Removed
 
-**Infrastructure preserved:**
-- `SNOWFLAKE_INTELLIGENCE` database
-- `SNOWFLAKE_INTELLIGENCE.MCP` schema
-- `SNOWFLAKE_DOCUMENTATION` database share
-- Programmatic access tokens (managed by the user)
+| Object | Action |
+|--------|--------|
+| Custom tool functions | Dropped |
+| MCP server object | Dropped |
+| `MCP_ACCESS_ROLE` | Dropped (automatically revoked from all users) |
 
-To remove your PAT token manually (optional):
+### What Gets Preserved
+
+| Object | Reason |
+|--------|--------|
+| `SNOWFLAKE_INTELLIGENCE` database | Reusable infrastructure |
+| `SNOWFLAKE_INTELLIGENCE.MCP` schema | Reusable infrastructure |
+| `SNOWFLAKE_DOCUMENTATION` database | May be used by other examples |
+| PAT tokens | User-managed, may be used elsewhere |
+
+### Optional: Remove PAT Token
 
 ```sql
 -- List your tokens
@@ -393,17 +469,17 @@ ALTER USER CURRENT_USER() DROP PROGRAMMATIC ACCESS TOKEN <token_name>;
 
 ---
 
-## Troubleshooting
+## 🔍 Troubleshooting
 
 ### HTTP 401: Authorization Failed
 
 **Cause:** PAT token missing required grants
 
 **Fix:**
-1. Run [`sql/03_operations/troubleshoot.sql`](sql/03_operations/troubleshoot.sql) to check grants
-2. Verify `MCP_ACCESS_ROLE` exists and has 4 required grants
+1. Run **[`sql/03_operations/troubleshoot.sql`](sql/03_operations/troubleshoot.sql)** to check grants
+2. Verify `MCP_ACCESS_ROLE` exists and has 5 required grants
 3. Verify role is assigned to your user
-4. Re-run [`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql) if needed (it's idempotent)
+4. Re-run **[`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql)** if needed (it's idempotent)
 
 ### HTTP 404 or "Agent Server does not exist"
 
@@ -411,11 +487,13 @@ ALTER USER CURRENT_USER() DROP PROGRAMMATIC ACCESS TOKEN <token_name>;
 
 **Fix:**
 1. Ensure you have `ACCOUNTADMIN`, `SYSADMIN`, and `SECURITYADMIN` roles
-2. Re-run [`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql) - it creates the server automatically
+2. Re-run **[`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql)** - it creates the server automatically
 3. Verify with:
 ```sql
 SHOW MCP SERVERS IN SCHEMA SNOWFLAKE_INTELLIGENCE.MCP;
 ```
+
+**📚 More Help:** See **[Troubleshooting Guide](docs/03-TROUBLESHOOTING.md)** for complete diagnostic procedures.
 
 ### SSL Certificate Error
 
@@ -456,13 +534,17 @@ SHOW USER PROGRAMMATIC ACCESS TOKENS;
 - [ ] Open Continue panel (Cmd+L / Ctrl+L) to verify
 
 **For All IDEs:**
-- [ ] `tools/03_test_connection.sh` or `tools\03_test_connection.bat` returns HTTP 200?
+- [ ] Verification script returns HTTP 200?
+  - Unix/macOS: `./tools/03_test_connection.sh --url <URL> --hostname <HOST>`
+  - Windows: `tools\03_test_connection.bat --url <URL> --hostname <HOST>`
 - [ ] Token hasn't expired (default: 365 days)?
 - [ ] MCP server URL uses lowercase format?
 
+**📚 More Help:** See **[Troubleshooting Guide](docs/03-TROUBLESHOOTING.md)** for complete diagnostic procedures.
+
 ---
 
-## IDE Compatibility Matrix
+## 📊 IDE Compatibility Matrix
 
 | Feature | Cursor | Claude Desktop | VS Code + Continue | Zed |
 |---------|--------|----------------|-------------------|-----|
@@ -482,13 +564,22 @@ SHOW USER PROGRAMMATIC ACCESS TOKENS;
 
 ---
 
-## Additional Resources
+## 📚 Additional Resources
 
-- [Model Context Protocol Documentation](https://modelcontextprotocol.io/)
+**Model Context Protocol:**
+- [MCP Documentation](https://modelcontextprotocol.io/)
 - [MCP Implementation List](https://modelcontextprotocol.io/implementations) - See all compatible IDEs
-- [Snowflake Managed MCP Server Documentation](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp)
-- [Snowflake Programmatic Access Tokens](https://docs.snowflake.com/en/user-guide/authentication-using-pat)
-- [Snowflake RBAC Best Practices](https://docs.snowflake.com/user-guide/security-access-control-considerations)
+
+**Snowflake Documentation:**
+- [Managed MCP Server Guide](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp)
+- [Programmatic Access Tokens](https://docs.snowflake.com/en/user-guide/authentication-using-pat)
+- [RBAC Best Practices](https://docs.snowflake.com/user-guide/security-access-control-considerations)
+
+**Project Documentation:**
+- [Complete Setup Guide](docs/01-SETUP.md)
+- [Security Model](docs/02-SECURITY.md)
+- [Troubleshooting Guide](docs/03-TROUBLESHOOTING.md)
+- [Custom Tools Guide](docs/04-CUSTOM-TOOLS.md)
 
 ---
 
@@ -502,18 +593,29 @@ Apache License 2.0 - See [LICENSE](./LICENSE) file for details.
 
 ---
 
-## Summary
+## ✨ Summary
 
-**Delivered by this project**
-- Secure MCP server with minimal privileges
-- Production-ready setup in approximately five minutes
-- Documented security boundaries and troubleshooting guidance
-- Automated verification tooling and cleanup scripts
+### What This Project Delivers
 
-**Not included**
-- Overly broad permissions
-- PUBLIC role grants
-- Complex multi-script workflows
-- Security trade-offs
+✅ **Secure MCP server** with minimal privileges  
+✅ **Production-ready setup** in ~20 minutes  
+✅ **Comprehensive documentation** for all components  
+✅ **Automated tooling** for cross-platform deployment  
+✅ **Extensibility templates** for custom tools  
+✅ **Complete cleanup** procedures
 
-Start now by following [`docs/01-SETUP.md`](docs/01-SETUP.md) or, if you prefer automation, run `tools/00_master.sh` (macOS/Linux) or `tools\00_master.bat` (Windows).
+### What's NOT Included
+
+❌ Overly broad permissions  
+❌ PUBLIC role grants  
+❌ Complex multi-script workflows  
+❌ Security trade-offs
+
+---
+
+## 🚀 Getting Started
+
+**Ready to begin?**
+- **Manual Setup:** Follow **[Setup Guide](docs/01-SETUP.md)**
+- **Automated Setup:** Run `tools/00_master.sh --profile <PROFILE>` (Unix/macOS) or `tools\00_master.bat --profile <PROFILE>` (Windows)
+- **Full Documentation:** Browse **[docs/](docs/)** directory for complete guides

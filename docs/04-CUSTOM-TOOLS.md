@@ -54,11 +54,17 @@ When you ask your AI assistant a question that matches a tool's description, the
 
 ## Adding Your Own Custom Tools
 
-To add custom tools to the MCP server:
+This project provides templates and configuration files to make adding custom tools straightforward.
 
-1. **Create a UDF or stored procedure** in `SNOWFLAKE_INTELLIGENCE.MCP` schema
-2. **Grant `USAGE`** to `MCP_ACCESS_ROLE`
-3. **Update the MCP server specification** in `sql/01_setup/setup_mcp.sql`:
+### Quick Start
+
+1. **Copy a template:**
+   - For generic UDFs: Copy `sql/02_custom_tools/_TEMPLATE.sql` to a new file
+   - For semantic views: Copy `sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql`
+
+2. **Implement your function** in the copied SQL file
+
+3. **Add tool definition** to `config/mcp_spec.yaml`:
    ```yaml
    - name: "your-tool-name"
      type: "GENERIC"
@@ -76,8 +82,26 @@ To add custom tools to the MCP server:
      outputSchema:
        type: "object"  # or "array" for table functions
    ```
-4. **Add cleanup logic** to `sql/99_cleanup/teardown_all.sql`
-5. **Test your tool** by asking your AI assistant questions that should trigger it
+
+4. **Run your SQL file** to create the function
+
+5. **Re-run** `sql/01_setup/setup_mcp.sql` to update the MCP server with the new tool
+
+6. **Add cleanup logic** to `sql/99_cleanup/teardown_all.sql`
+
+7. **Test your tool** by asking your AI assistant questions that should trigger it
+
+### Templates Provided
+
+- **`sql/02_custom_tools/_TEMPLATE.sql`** - Starting point for generic UDFs and table functions
+- **`sql/02_custom_tools/SEMANTIC_VIEWS_TEMPLATE.sql`** - Template for Cortex Analyst semantic views
+- **`config/mcp_spec.yaml`** - Includes commented template at the bottom
+
+Each template includes:
+- Step-by-step instructions
+- Working examples
+- Security considerations
+- Testing guidance
 
 ## Tool Type Reference
 

@@ -1,0 +1,70 @@
+# MCP Server Tool Specification
+# Author: SE Community
+# Purpose: Defines tools exposed through the MCP server
+#
+# CUSTOMIZATION: Add, remove, or modify tools to match your requirements
+#
+# Tool Types:
+#   - CORTEX_SEARCH_SERVICE_QUERY: Semantic search over data
+#   - CORTEX_ANALYST_MESSAGE: Text-to-SQL generation
+#   - CORTEX_AGENT_RUN: AI agent invocation
+#   - GENERIC: Custom UDF/stored procedure
+#   - SYSTEM_EXECUTE_SQL: Direct SQL execution (use with caution)
+
+tools:
+  # Primary Tool: Snowflake Documentation Search
+  - name: "snowflake-docs-search"
+    type: "CORTEX_SEARCH_SERVICE_QUERY"
+    identifier: "SNOWFLAKE_DOCUMENTATION.SHARED.CKE_SNOWFLAKE_DOCS_SERVICE"
+    description: "Search Snowflake documentation using Cortex Search"
+    title: "Snowflake Documentation Search"
+
+  # Custom Tool: Account Environment Info
+  - name: "get-account-info"
+    type: "GENERIC"
+    identifier: "SNOWFLAKE_INTELLIGENCE.MCP.GET_ACCOUNT_INFO"
+    description: "Returns current Snowflake account environment information (version, region, account name, etc.)"
+    title: "Snowflake Account Info"
+    warehouse: "COMPUTE_WH"
+    inputSchema:
+      type: "object"
+      properties: {}
+    outputSchema:
+      type: "object"
+
+  # Custom Tool: Function Finder
+  - name: "find-snowflake-functions"
+    type: "GENERIC"
+    identifier: "SNOWFLAKE_INTELLIGENCE.MCP.FIND_SNOWFLAKE_FUNCTIONS"
+    description: "Searches Snowflake documentation for built-in functions by keyword (e.g., 'string', 'date', 'array')"
+    title: "Snowflake Function Finder"
+    warehouse: "COMPUTE_WH"
+    inputSchema:
+      type: "object"
+      properties:
+        search_term:
+          type: "string"
+          description: "Keyword to search for (e.g., 'string', 'date', 'json')"
+      required: ["search_term"]
+    outputSchema:
+      type: "array"
+
+  # TEMPLATE: Add Your Custom Tools Below
+  # Uncomment and modify this example to add a new tool:
+  #
+  # - name: "my-custom-tool"
+  #   type: "GENERIC"
+  #   identifier: "SNOWFLAKE_INTELLIGENCE.MCP.MY_CUSTOM_FUNCTION"
+  #   description: "Clear description of what your tool does"
+  #   title: "Human-Readable Tool Name"
+  #   warehouse: "COMPUTE_WH"
+  #   inputSchema:
+  #     type: "object"
+  #     properties:
+  #       param_name:
+  #         type: "string"
+  #         description: "Parameter description"
+  #     required: ["param_name"]
+  #   outputSchema:
+  #     type: "object"  # or "array" for table functions
+

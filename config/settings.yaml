@@ -1,0 +1,46 @@
+# Snowflake MCP Server Configuration
+# Author: SE Community
+# Purpose: Centralized configuration for MCP server setup
+#
+# CUSTOMIZATION: Edit these values to match your environment
+
+# Core Infrastructure Settings
+database: SNOWFLAKE_INTELLIGENCE
+schema: MCP
+mcp_server_name: SNOWFLAKE_MCP_SERVER
+
+# Role and Access Control
+role_name: MCP_ACCESS_ROLE
+role_comment: "Minimal privileges for MCP server API access via PAT tokens"
+
+# Warehouse Configuration
+warehouse: COMPUTE_WH
+
+# Token Settings
+token_prefix: MCP_PAT_
+token_expiry_days: 365
+token_comment: "MCP server authentication token"
+
+# Marketplace Database
+documentation_database: SNOWFLAKE_DOCUMENTATION
+marketplace_listing_id: GZSTZ67BY9OQ4
+
+# Demo Expiration (for public GitHub demos)
+demo_expiry_date: "2025-12-24"
+
+# Custom Tool Configuration
+custom_tools_enabled: true
+custom_tools:
+  - name: get_account_info
+    function_name: GET_ACCOUNT_INFO
+    enabled: true
+  - name: find_snowflake_functions
+    function_name: FIND_SNOWFLAKE_FUNCTIONS
+    enabled: true
+
+# Advanced Settings
+auto_accept_marketplace_terms: true
+create_database_if_not_exists: true
+create_schema_if_not_exists: true
+idempotent_grants: true
+

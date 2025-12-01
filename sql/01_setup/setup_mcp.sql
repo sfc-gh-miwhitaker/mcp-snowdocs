@@ -28,6 +28,29 @@
  ******************************************************************************/
 
 -- ###########################################################################
+-- # CUSTOMIZATION SECTION - Edit these values for your environment
+-- ###########################################################################
+
+-- Database and Schema Configuration
+SET mcp_database = 'SNOWFLAKE_INTELLIGENCE';
+SET mcp_schema = 'MCP';
+SET mcp_server_name = 'SNOWFLAKE_MCP_SERVER';
+
+-- Role Configuration
+SET role_name = 'MCP_ACCESS_ROLE';
+SET role_comment = 'Minimal privileges for MCP server API access via PAT tokens';
+
+-- Marketplace Configuration
+SET docs_database = 'SNOWFLAKE_DOCUMENTATION';
+SET marketplace_listing_id = 'GZSTZ67BY9OQ4';
+
+-- Warehouse for Custom Tools
+SET custom_warehouse = 'COMPUTE_WH';
+
+-- NOTE: For advanced customization, see config/settings.yaml and config/mcp_spec.yaml
+-- These files provide a centralized location for all configuration values.
+
+-- ###########################################################################
 -- # EXPIRATION CHECK (Public GitHub Demo)
 -- ###########################################################################
 
@@ -50,24 +73,27 @@ USE ROLE ACCOUNTADMIN;
 CALL SYSTEM$ACCEPT_LEGAL_TERMS('DATA_EXCHANGE_LISTING', 'GZSTZ67BY9OQ4');
 
 -- Import Snowflake Documentation database from Marketplace
-CREATE DATABASE IF NOT EXISTS SNOWFLAKE_DOCUMENTATION
-  FROM LISTING IDENTIFIER('"GZSTZ67BY9OQ4"'); -- do not alter this string
+CREATE DATABASE IF NOT EXISTS IDENTIFIER($docs_database)
+  FROM LISTING IDENTIFIER($marketplace_listing_id);
 
 -- Grant imported privileges to the dedicated role so it can query documentation.
-GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE_DOCUMENTATION TO ROLE MCP_ACCESS_ROLE;
+GRANT IMPORTED PRIVILEGES ON DATABASE IDENTIFIER($docs_database) TO ROLE IDENTIFIER($role_name);
 
 -- Create MCP server infrastructure (requires SYSADMIN)
 USE ROLE SYSADMIN;
-CREATE DATABASE IF NOT EXISTS SNOWFLAKE_INTELLIGENCE
+CREATE DATABASE IF NOT EXISTS IDENTIFIER($mcp_database)
   COMMENT = 'Snowflake Intelligence features including MCP servers';
 
-CREATE SCHEMA IF NOT EXISTS SNOWFLAKE_INTELLIGENCE.MCP
+CREATE SCHEMA IF NOT EXISTS IDENTIFIER($mcp_database || '.' || $mcp_schema)
   COMMENT = 'Model Context Protocol (MCP) servers';
 
 -- Create the MCP server with documentation search + custom tools
 -- Note: Provides access to Snowflake documentation via Cortex Search
 --       plus custom demonstration tools (Account Info + Function Finder)
-CREATE OR REPLACE MCP SERVER SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER
+-- 
+-- CUSTOMIZATION: To add or modify tools, edit config/mcp_spec.yaml
+--                then update the FROM SPECIFICATION section below
+CREATE OR REPLACE MCP SERVER IDENTIFIER($mcp_database || '.' || $mcp_schema || '.' || $mcp_server_name)
   FROM SPECIFICATION $$
     tools:
       # Primary tool: Documentation search
@@ -109,7 +135,7 @@ CREATE OR REPLACE MCP SERVER SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER
   $$;
 
 -- Verify MCP server was created (optional - uncomment for debugging)
--- SHOW MCP SERVERS IN SCHEMA SNOWFLAKE_INTELLIGENCE.MCP;
+-- SHOW MCP SERVERS IN SCHEMA IDENTIFIER($mcp_database || '.' || $mcp_schema);
 
 -- ###########################################################################
 -- # PART 2: Create Dedicated MCP Access Role (Minimal Privileges)
@@ -121,8 +147,8 @@ SET session_user_name = (SELECT CURRENT_USER());
 USE ROLE SECURITYADMIN;
 
 -- Create a dedicated role for MCP server access
-CREATE ROLE IF NOT EXISTS MCP_ACCESS_ROLE
-  COMMENT = 'Minimal privileges for MCP server API access via PAT tokens';
+CREATE ROLE IF NOT EXISTS IDENTIFIER($role_name)
+  COMMENT = $role_comment;
 
 -- ###########################################################################
 -- # PART 3: Grant Minimal Required Privileges
@@ -130,19 +156,19 @@ CREATE ROLE IF NOT EXISTS MCP_ACCESS_ROLE
 
 USE ROLE SYSADMIN;
 
--- Grant USAGE on SNOWFLAKE_INTELLIGENCE database (required for MCP server access)
-GRANT USAGE ON DATABASE SNOWFLAKE_INTELLIGENCE TO ROLE MCP_ACCESS_ROLE;
+-- Grant USAGE on database (required for MCP server access)
+GRANT USAGE ON DATABASE IDENTIFIER($mcp_database) TO ROLE IDENTIFIER($role_name);
 
 -- Grant USAGE on MCP schema (required to access MCP server objects)
-GRANT USAGE ON SCHEMA SNOWFLAKE_INTELLIGENCE.MCP TO ROLE MCP_ACCESS_ROLE;
+GRANT USAGE ON SCHEMA IDENTIFIER($mcp_database || '.' || $mcp_schema) TO ROLE IDENTIFIER($role_name);
 
 -- Grant USAGE on the specific MCP server (required to call MCP endpoints)
-GRANT USAGE ON MCP SERVER SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER
-  TO ROLE MCP_ACCESS_ROLE;
+GRANT USAGE ON MCP SERVER IDENTIFIER($mcp_database || '.' || $mcp_schema || '.' || $mcp_server_name)
+  TO ROLE IDENTIFIER($role_name);
 
--- Grant IMPORTED PRIVILEGES on SNOWFLAKE_DOCUMENTATION database
+-- Grant IMPORTED PRIVILEGES on documentation database
 -- This gives access to the Cortex Search Service that the MCP server uses
-GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE_DOCUMENTATION TO ROLE MCP_ACCESS_ROLE;
+GRANT IMPORTED PRIVILEGES ON DATABASE IDENTIFIER($docs_database) TO ROLE IDENTIFIER($role_name);
 
 -- ###########################################################################
 -- # PART 4: Assign Role to Your User
@@ -151,7 +177,7 @@ GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE_DOCUMENTATION TO ROLE MCP_ACCESS
 USE ROLE SECURITYADMIN;
 
 -- Assign the MCP access role to your current user
-GRANT ROLE MCP_ACCESS_ROLE TO USER IDENTIFIER($session_user_name);
+GRANT ROLE IDENTIFIER($role_name) TO USER IDENTIFIER($session_user_name);
 
 -- ###########################################################################
 -- # PART 5: Verify Token Configuration
@@ -168,18 +194,18 @@ GRANT ROLE MCP_ACCESS_ROLE TO USER IDENTIFIER($session_user_name);
 -- # PART 6: Verify Setup
 -- ###########################################################################
 
--- Verify MCP_ACCESS_ROLE has correct privileges (optional - uncomment for debugging)
--- SHOW GRANTS TO ROLE MCP_ACCESS_ROLE;
+-- Verify role has correct privileges (optional - uncomment for debugging)
+-- SHOW GRANTS TO ROLE IDENTIFIER($role_name);
 
--- Verify your user has MCP_ACCESS_ROLE (optional - uncomment for debugging)
+-- Verify your user has the role (optional - uncomment for debugging)
 -- SHOW GRANTS TO USER IDENTIFIER($session_user_name);
 
--- Test if MCP_ACCESS_ROLE can see the MCP server (optional - uncomment for debugging)
-USE ROLE MCP_ACCESS_ROLE;
--- SHOW MCP SERVERS IN SCHEMA SNOWFLAKE_INTELLIGENCE.MCP;
+-- Test if role can see the MCP server (optional - uncomment for debugging)
+USE ROLE IDENTIFIER($role_name);
+-- SHOW MCP SERVERS IN SCHEMA IDENTIFIER($mcp_database || '.' || $mcp_schema);
 
--- Test if MCP_ACCESS_ROLE can describe the MCP server
-DESC MCP SERVER SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER;
+-- Test if role can describe the MCP server
+DESC MCP SERVER IDENTIFIER($mcp_database || '.' || $mcp_schema || '.' || $mcp_server_name);
 
 -- ###########################################################################
 -- # PART 7: Display MCP Server URL

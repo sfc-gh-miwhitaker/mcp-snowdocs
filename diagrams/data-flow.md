@@ -24,7 +24,7 @@ This diagram shows how the provisioning scripts, local tooling, and Snowflake-ma
 graph TB
     subgraph "Local Environment"
         user[Engineer]
-        master[tools/00_master.sh<br/>python.cli.main master]
+        master[tools/mcp all<br/>python.cli.main master]
         ide[MCP-Compatible IDE]
     end
 
@@ -50,10 +50,10 @@ graph TB
 
 ## Component Descriptions
 
-### tools/00_master.sh / .bat
-- **Purpose:** Orchestrates create-token, setup-mcp, and verification steps through a single entry point.
-- **Technology:** Bash / Windows Batch invoking `python -m python.cli.main master`
-- **Location:** `tools/00_master.sh`, `tools/00_master.bat`
+### tools/mcp CLI
+- **Purpose:** Unified CLI that orchestrates all MCP operations (token, setup, test, proxy).
+- **Technology:** Bash (macOS) / Windows Batch invoking `python -m python.cli.main`
+- **Location:** `tools/mcp`, `tools/mcp.cmd`
 - **Dependencies:** Python CLI modules, Snow CLI configured via profile
 
 ### python.cli.main

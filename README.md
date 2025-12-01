@@ -38,8 +38,9 @@ Follow these steps in order:
 5. **[Security Review](docs/02-SECURITY.md)** — Understand the security model (5 min)
 6. **[Troubleshooting](docs/03-TROUBLESHOOTING.md)** — Keep handy for diagnostics
 7. **[Custom Tools Guide](docs/04-CUSTOM-TOOLS.md)** — Learn extensibility patterns (2 min)
+8. **[Proxy Setup](docs/05-PROXY-SETUP.md)** — Fix SSE streaming errors (if needed)
 
-**🚀 Alternative (Automated):** Run `tools/00_master.sh --profile <PROFILE>` (Unix/macOS) or `tools\00_master.bat --profile <PROFILE>` (Windows) to automate steps 2-3.
+**🚀 Alternative (Automated):** Run `./tools/mcp all --profile <PROFILE>` (macOS) or `tools\mcp all --profile <PROFILE>` (Windows) to automate steps 2-3.
 
 **⏱️ Total setup time:** ~20 minutes
 
@@ -106,11 +107,11 @@ Open **[`sql/01_setup/create_token.sql`](sql/01_setup/create_token.sql)** in Sno
 
 **CLI Alternative:**
 ```bash
-# Unix/macOS
-./tools/01_create_token.sh --profile <SNOWFLAKE_PROFILE>
+# macOS
+./tools/mcp token --profile <SNOWFLAKE_PROFILE>
 
 # Windows
-tools\01_create_token.bat --profile <SNOWFLAKE_PROFILE>
+tools\mcp token --profile <SNOWFLAKE_PROFILE>
 ```
 
 ### **Step 2: Setup MCP Server**
@@ -131,11 +132,11 @@ Open **[`sql/01_setup/setup_mcp.sql`](sql/01_setup/setup_mcp.sql)** in Snowsight
 
 **CLI Alternative:**
 ```bash
-# Unix/macOS
-./tools/02_setup_mcp.sh --profile <SNOWFLAKE_PROFILE>
+# macOS
+./tools/mcp setup --profile <SNOWFLAKE_PROFILE>
 
 # Windows
-tools\02_setup_mcp.bat --profile <SNOWFLAKE_PROFILE>
+tools\mcp setup --profile <SNOWFLAKE_PROFILE>
 ```
 
 ---
@@ -272,13 +273,11 @@ Any IDE that supports the [Model Context Protocol](https://modelcontextprotocol.
 
 **Test from command line:**
 ```bash
-# Unix/macOS
-./tools/03_test_connection.sh \
-  --url "YOUR_MCP_URL_FROM_STEP_2" \
-  --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
+# macOS
+./tools/mcp test --url "YOUR_MCP_URL_FROM_STEP_2" --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
 
 # Windows
-tools\03_test_connection.bat --url "YOUR_MCP_URL_FROM_STEP_2" --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
+tools\mcp test --url "YOUR_MCP_URL_FROM_STEP_2" --hostname "YOUR-ORG-YOUR-ACCOUNT.snowflakecomputing.com"
 ```
 
 **Expected output:** `MCP Server: Ready and responding`
@@ -389,7 +388,12 @@ The `MCP_ACCESS_ROLE` has **minimal grants** and nothing more:
 │   ├── 01-SETUP.md
 │   ├── 02-SECURITY.md
 │   ├── 03-TROUBLESHOOTING.md
-│   └── 04-CUSTOM-TOOLS.md
+│   ├── 04-CUSTOM-TOOLS.md
+│   └── 05-PROXY-SETUP.md       # SSE streaming fix
+├── proxy/                      # 🔧 LOCAL PROXY (for SSE issues)
+│   ├── config.example.js       # Copy to config.js and edit
+│   ├── package.json
+│   └── server.js
 ├── python/                     # CLI logic, services, and tests
 │   ├── cli/
 │   │   └── main.py
@@ -414,20 +418,17 @@ The `MCP_ACCESS_ROLE` has **minimal grants** and nothing more:
 │   │   └── troubleshoot.sql
 │   └── 99_cleanup/
 │       └── teardown_all.sql
-├── tools/                      # Cross-platform automation wrappers
-│   ├── 00_master.sh
-│   ├── 00_master.bat
-│   ├── 01_create_token.sh
-│   ├── 01_create_token.bat
-│   ├── 02_setup_mcp.sh
-│   ├── 02_setup_mcp.bat
-│   ├── 03_test_connection.sh
-│   └── 03_test_connection.bat
+├── tools/                      # Unified CLI for all operations
+│   ├── mcp                     # Main CLI (macOS)
+│   ├── mcp.cmd                 # Main CLI (Windows)
+│   ├── mac/                    # macOS-specific utilities
+│   ├── windows/                # Windows-specific utilities
+│   └── README.md               # CLI documentation
 ├── README.md                   # Main documentation
 ├── QUICKSTART.md               # Sequential onboarding
 └── LICENSE
 
-Legend: ✅ = Customize for your environment | 📋 = Copy and modify template
+Legend: ✅ = Customize for your environment | 📋 = Copy and modify template | 🔧 = SSE fix (use if getting streaming errors)
 ```
 
 ---
@@ -470,6 +471,26 @@ ALTER USER CURRENT_USER() DROP PROGRAMMATIC ACCESS TOKEN <token_name>;
 ---
 
 ## 🔍 Troubleshooting
+
+### SSE Streaming Error: "Failed to open SSE stream: Not Acceptable"
+
+**Cause:** Content negotiation issue between MCP client and Snowflake server
+
+**Fix:** Use the local proxy server that properly handles SSE headers:
+
+```bash
+# 1. Configure the proxy
+cp proxy/config.example.js proxy/config.js
+# Edit proxy/config.js with your MCP URL and PAT token
+
+# 2. Start the proxy
+./tools/mcp proxy start      # macOS
+tools\mcp proxy start        # Windows
+
+# 3. Update your IDE to use: http://127.0.0.1:3456/mcp
+```
+
+**📚 Full Guide:** See **[Proxy Setup Guide](docs/05-PROXY-SETUP.md)** for detailed instructions.
 
 ### HTTP 401: Authorization Failed
 
@@ -535,8 +556,8 @@ SHOW USER PROGRAMMATIC ACCESS TOKENS;
 
 **For All IDEs:**
 - [ ] Verification script returns HTTP 200?
-  - Unix/macOS: `./tools/03_test_connection.sh --url <URL> --hostname <HOST>`
-  - Windows: `tools\03_test_connection.bat --url <URL> --hostname <HOST>`
+  - macOS: `./tools/mcp test --url <URL> --hostname <HOST>`
+  - Windows: `tools\mcp test --url <URL> --hostname <HOST>`
 - [ ] Token hasn't expired (default: 365 days)?
 - [ ] MCP server URL uses lowercase format?
 
@@ -617,5 +638,5 @@ Apache License 2.0 - See [LICENSE](./LICENSE) file for details.
 
 **Ready to begin?**
 - **Manual Setup:** Follow **[Setup Guide](docs/01-SETUP.md)**
-- **Automated Setup:** Run `tools/00_master.sh --profile <PROFILE>` (Unix/macOS) or `tools\00_master.bat --profile <PROFILE>` (Windows)
+- **Automated Setup:** Run `./tools/mcp all --profile <PROFILE>` (macOS) or `tools\mcp all --profile <PROFILE>` (Windows)
 - **Full Documentation:** Browse **[docs/](docs/)** directory for complete guides

@@ -1,0 +1,28 @@
+{
+  "name": "mcp-snowflake-proxy",
+  "version": "1.0.0",
+  "description": "Local proxy server to fix SSE streaming issues with Snowflake MCP server",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "mcp",
+    "snowflake",
+    "proxy",
+    "sse"
+  ],
+  "author": "SE Community",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.21.2",
+    "eventsource": "^2.0.2",
+    "dotenv": "^16.4.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

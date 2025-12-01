@@ -15,8 +15,8 @@
    - Record the timestamp and which environment (dev/test/prod) encountered the issue.
 
 2. **Validate MCP endpoint**
-   - macOS/Linux: `tools/03_test_connection.sh --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`
-   - Windows: `tools\03_test_connection.bat --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`
+   - macOS: `./tools/mcp test --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`
+   - Windows: `tools\mcp test --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`
    - Expected results:
      - SSL validation output showing a valid certificate subject.
      - HTTP status `200`, `400`, or `405` with JSON payload.
@@ -44,6 +44,8 @@
 | HTTP 404 from verification script | MCP server not provisioned | Rerun `sql/01_setup/setup_mcp.sql` |
 | SSL certificate failure | Region-based hostname used | Switch to `<org>-<account>.snowflakecomputing.com` |
 | IDE cannot discover MCP server | Client not restarted after config update | Save config and restart the IDE |
+| "Failed to open SSE stream: Not Acceptable" | SSE content negotiation issue | Use local proxy - see [Proxy Setup](05-PROXY-SETUP.md) |
+| 406 Not Acceptable | Accept header not set correctly | Use local proxy - see [Proxy Setup](05-PROXY-SETUP.md) |
 
 ## Escalation
 

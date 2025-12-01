@@ -19,21 +19,18 @@
 | `sql/01_setup/setup_mcp.sql` | Builds the MCP server, grants least-privilege access, returns the MCP URL | Snowflake workspace |
 | `sql/03_operations/troubleshoot.sql` | Diagnostic queries if verification fails | Snowflake workspace |
 | `sql/99_cleanup/teardown_all.sql` | Removes MCP-specific resources while preserving shared infrastructure | Snowflake workspace |
-| `tools/01_create_token.sh` / `.bat` | Runs `create_token.sql` through the Snow CLI | Local |
-| `tools/02_setup_mcp.sh` / `.bat` | Runs `setup_mcp.sql` through the Snow CLI | Local |
-| `tools/03_test_connection.sh` / `.bat` | Verifies the MCP endpoint over HTTPS | Local |
-| `tools/00_master.sh` / `.bat` | Orchestrates the full setup workflow end-to-end | Local |
+| `tools/mcp` / `mcp.cmd` | Unified CLI for all MCP operations | Local |
 
 > The SQL scripts can be executed from Snowsight or by using the wrapper scripts above. Choose whichever approach matches your workflow.
 
 ## Step-by-Step Instructions
 
 1. **Create the PAT token**
-   - Execute `sql/01_setup/create_token.sql` in Snowsight **or** run `tools/01_create_token.sh --profile <PROFILE>` (Windows: `tools\01_create_token.bat --profile <PROFILE>`).
+   - Execute `sql/01_setup/create_token.sql` in Snowsight **or** run `./tools/mcp token --profile <PROFILE>` (Windows: `tools\mcp token --profile <PROFILE>`).
    - **Expected output:** A result set containing a `TOKEN_SECRET` column. Copy the token immediately; Snowflake displays it only once.
 
 2. **Provision the MCP server**
-   - Execute `sql/01_setup/setup_mcp.sql` in Snowsight **or** run `tools/02_setup_mcp.sh --profile <PROFILE>` (Windows: `tools\02_setup_mcp.bat --profile <PROFILE>`).
+   - Execute `sql/01_setup/setup_mcp.sql` in Snowsight **or** run `./tools/mcp setup --profile <PROFILE>` (Windows: `tools\mcp setup --profile <PROFILE>`).
    - **Expected output:** A result set containing an `MCP_URL` column along with confirmation messages that the role grants were applied.
 
 3. **Configure your MCP-compatible client**
@@ -53,8 +50,8 @@
    - Save the file and restart the IDE so the new server registration is loaded.
 
 4. **Verify connectivity**
-   - On macOS/Linux, run `tools/03_test_connection.sh --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`.
-   - On Windows, run `tools\03_test_connection.bat --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`.
+   - On macOS, run `./tools/mcp test --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`.
+   - On Windows, run `tools\mcp test --url <MCP_URL> --hostname <ORG-ACCOUNT>.snowflakecomputing.com`.
    - **Expected output:** HTTP status `200` or `400/405` along with a JSON response from the MCP server. SSL validation should succeed for the hostname you provide.
 
 5. **(Optional) Run diagnostics**

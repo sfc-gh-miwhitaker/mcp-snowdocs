@@ -54,10 +54,10 @@ graph TB
 
 ## Component Descriptions
 
-### python.cli.main / tools/*
+### python.cli.main / tools/mcp CLI
 - **Purpose:** Sends Snow CLI commands and optional verification requests over HTTPS.
-- **Technology:** Python subprocess calls into the Snow CLI; shell/batch wrappers.
-- **Location:** `python/cli/main.py`, `tools/00_master.*`, `tools/01_*`, `tools/02_*`, `tools/03_*`
+- **Technology:** Python subprocess calls into the Snow CLI; unified CLI wrappers.
+- **Location:** `python/cli/main.py`, `tools/mcp`, `tools/mcp.cmd`
 - **Dependencies:** Snow CLI authentication profile, outbound HTTPS access on port 443
 
 ### SNOWFLAKE_INTELLIGENCE.MCP.SNOWFLAKE_MCP_SERVER

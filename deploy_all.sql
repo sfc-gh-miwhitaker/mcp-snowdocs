@@ -9,7 +9,7 @@
  * EXECUTION METHOD: Snowsight "Run All" (Copy/Paste → Click "Run All")
  *
  * OUTPUT:
- *   - Single result set containing MCP_URL and TOKEN_SECRET (shown only once)
+ *   - Single result set containing MCP_URL
  *
  * ESTIMATED RUNTIME: ~2 minutes
  * ESTIMATED COST: Low (XSMALL warehouse, short runtime)
@@ -100,41 +100,19 @@ SET current_username = CURRENT_USER();
 GRANT ROLE SFE_SNOWDOCS_MCP_ACCESS_ROLE TO USER IDENTIFIER($current_username);
 
 /*******************************************************************************
- * PART 5: Authentication Token (PAT)
- *
- * SECURITY WARNING: The token secret is shown only once. Copy it immediately.
+ * PART 5: Final Output (only visible result in Snowsight Run All)
  ******************************************************************************/
-
-SET token_name = 'MCP_PAT_' || TO_VARCHAR(CURRENT_TIMESTAMP(), 'YYYYMMDD_HH24MISS');
-
-ALTER USER IDENTIFIER($current_username)
-  ADD PROGRAMMATIC ACCESS TOKEN IDENTIFIER($token_name)
-  DAYS_TO_EXPIRY = 365
-  COMMENT = 'DEMO: MCP server authentication token. Author: SE Community. EXPIRES: 2026-02-07';
-
--- Capture token secret from the previous statement so it can be included in the final (visible) result set.
-SET token_secret = (
-  SELECT "token_secret"::STRING
-  FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()))
-);
-
-/*******************************************************************************
- * PART 6: Final Output (only visible result in Snowsight Run All)
- ******************************************************************************/
-
-SET mcp_url =
-  'https://' ||
-  REPLACE(LOWER(CURRENT_ORGANIZATION_NAME()), '_', '-') || '-' ||
-  REPLACE(LOWER(CURRENT_ACCOUNT_NAME()), '_', '-') ||
-  '.snowflakecomputing.com/api/v2/databases/SNOWFLAKE_EXAMPLE/schemas/snowdocs_mcp/mcp-servers/snowflake_docs_mcp_server';
 
 SELECT
-  $mcp_url::STRING AS mcp_url,
-  $token_secret::STRING AS token_secret,
-  $token_name::STRING AS token_name,
+  (
+    'https://' ||
+    REPLACE(LOWER(CURRENT_ORGANIZATION_NAME()), '_', '-') || '-' ||
+    REPLACE(LOWER(CURRENT_ACCOUNT_NAME()), '_', '-') ||
+    '.snowflakecomputing.com/api/v2/databases/SNOWFLAKE_EXAMPLE/schemas/snowdocs_mcp/mcp-servers/snowflake_docs_mcp_server'
+  )::STRING AS mcp_url,
   'SFE_SNOWDOCS_MCP_ACCESS_ROLE' AS access_role,
   'SFE_SNOWDOCS_MCP_WH' AS warehouse,
-  'Copy MCP_URL + TOKEN_SECRET into your MCP client configuration. See README.md.' AS next_step;
+  'If you need a new PAT token, run create_pat.sql (optional). See README.md.' AS next_step;
 
 -- =============================================================================
 -- VERIFICATION QUERIES (Run individually AFTER deployment completes)

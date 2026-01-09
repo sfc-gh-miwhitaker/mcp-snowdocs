@@ -9,7 +9,7 @@ Status: Reference Implementation
 Reference Implementation: This code demonstrates production-grade architectural patterns and best practices. Review and customize security, networking, and logic for your organization's specific requirements before deployment.
 
 ## Overview
-This diagram shows how a Programmatic Access Token (PAT) is created during deployment, how it is used by an MCP client as a bearer token, and how Snowflake RBAC enforces authorization for MCP server usage.
+This diagram shows how a Programmatic Access Token (PAT) can be created (optional), how it is used by an MCP client as a bearer token, and how Snowflake RBAC enforces authorization for MCP server usage.
 
 ```mermaid
 sequenceDiagram
@@ -23,9 +23,12 @@ sequenceDiagram
   User->>Snowsight: Run deploy_all.sql
   Snowsight->>SF: USE ROLE SYSADMIN + SECURITYADMIN
   SF->>SF: CREATE ROLE / GRANT USAGE / GRANT IMPORTED PRIVILEGES
+  Snowsight-->>User: MCP_URL
+
+  User->>Snowsight: (Optional) Run create_pat.sql
   SF->>SF: ALTER USER ... ADD PROGRAMMATIC ACCESS TOKEN
   SF-->>Snowsight: token_secret (shown once)
-  Snowsight-->>User: MCP_URL + TOKEN_SECRET
+  Snowsight-->>User: TOKEN_SECRET
 
   User->>IDE: Configure MCP_URL + Bearer TOKEN_SECRET
   IDE->>SF: HTTPS request to MCP endpoint + Authorization: Bearer TOKEN_SECRET
@@ -40,7 +43,7 @@ sequenceDiagram
 ## Component Descriptions
 - Purpose: Token issuance
 - Technology: Snowflake Programmatic Access Token (PAT)
-- Location: `deploy_all.sql` (PART 5)
+- Location: `create_pat.sql`
 - Deps: Token secret must be stored securely by the user; it cannot be retrieved later
 
 - Purpose: Authorization boundary

@@ -36,16 +36,24 @@ Deploys a Snowflake MCP server that gives your AI assistant:
 
 1. Open [`deploy_all.sql`](deploy_all.sql) in **Snowsight**
 2. Click **"Run All"**
-3. **Copy these two values immediately:**
-   - `MCP_URL` from the first result
-   - `TOKEN_SECRET` from the first result (shown only once)
-4. **Save the token in your password manager** - you can't see it again!
+3. **Copy `MCP_URL`** from the final result set
 
 **Time:** ~2 minutes
 
 ---
 
-### Step 2: Configure Your IDE
+### Step 2 (Optional): Create a PAT Token
+
+Run this only if you need a new token secret:
+
+1. Open [`create_pat.sql`](create_pat.sql) in **Snowsight**
+2. Click **"Run All"**
+3. **Copy `TOKEN_SECRET` immediately** (shown only once)
+4. Save the token secret in your password manager
+
+---
+
+### Step 3: Configure Your IDE
 
 Choose your IDE and follow the setup below:
 
@@ -164,7 +172,6 @@ When you're done, run [`cleanup.sql`](cleanup.sql) in Snowsight to remove all MC
 This will:
 - Drop the MCP server
 - Drop the MCP_ACCESS_ROLE
-- Drop custom tool functions
 
 **Preserved:**
 - SNOWFLAKE_EXAMPLE database (shared demo database; reused across demos)
@@ -186,7 +193,7 @@ Create a simple Node.js proxy that handles SSE headers correctly (separate repos
 **Cause:** Token expired or incorrect
 
 **Fix:**
-1. Re-run `deploy_all.sql` to generate a new token
+1. Re-run `create_pat.sql` to generate a new token
 2. Update your IDE configuration with the new token
 3. Restart your IDE
 
@@ -207,7 +214,7 @@ PAT tokens expire after 365 days by default.
 SHOW USER PROGRAMMATIC ACCESS TOKENS;
 ```
 
-**Fix:** Re-run `deploy_all.sql` to create a new token.
+**Fix:** Re-run `create_pat.sql` to create a new token.
 
 ---
 
@@ -217,7 +224,7 @@ The `MCP_ACCESS_ROLE` has **minimal privileges**:
 
 **What it CAN do:**
 - Query Snowflake documentation
-- Execute custom MCP tools (account info, function finder)
+- Query docs via MCP tools (docs search, function finder)
 
 **What it CANNOT do:**
 - Access your databases or tables
@@ -238,7 +245,7 @@ The `MCP_ACCESS_ROLE` has **minimal privileges**:
 | `SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP` | Project schema namespace (collision-proof) |
 | `SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_SERVER` | MCP server endpoint |
 | `SFE_SNOWDOCS_MCP_ACCESS_ROLE` | Minimal-privilege role granted USAGE on MCP server + supporting objects |
-| PAT Token (on current user) | Authentication token (365-day expiry by default) |
+| PAT Token (on current user) | Optional authentication token created by `create_pat.sql` (365-day expiry by default) |
 
 ---
 
@@ -258,7 +265,8 @@ Apache License 2.0 - See [LICENSE](./LICENSE)
 
 ## Summary
 
-**Deploy:** Run `deploy_all.sql` in Snowsight → Copy URL + Token
+**Deploy:** Run `deploy_all.sql` in Snowsight → Copy MCP_URL
+**Token (optional):** Run `create_pat.sql` → Copy TOKEN_SECRET
 **Configure:** Add to your IDE config file → Restart IDE
 **Test:** Ask Snowflake questions in your AI assistant
 **Cleanup:** Run `cleanup.sql` when done

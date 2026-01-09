@@ -17,6 +17,7 @@ graph LR
     User[User]
     Snowsight[Snowsight]
     Deploy[deploy_all.sql<br/>Run All]
+    Token[create_pat.sql<br/>(optional)]
   end
 
   subgraph "Snowflake Account"
@@ -34,8 +35,11 @@ graph LR
   User --> Snowsight --> Deploy
   Deploy -->|Creates| MCP
   Deploy -->|Creates/Grants| Role
-  Deploy -->|Adds token to user| PAT
   Deploy -->|Creates/uses| WH
+  Deploy -->|Provides| MCP_URL
+
+  User --> Snowsight --> Token
+  Token -->|Adds token to user| PAT
 
   IDE -->|HTTPS + Bearer token_secret| MCP
   MCP -->|Executes on| WH
@@ -64,7 +68,7 @@ graph LR
 
 - Purpose: Authentication + authorization
 - Technology: Programmatic Access Token (PAT) + RBAC role grants
-- Location: PAT created in `deploy_all.sql`; bearer token used in MCP client config
+- Location: PAT created in `create_pat.sql` (optional); bearer token used in MCP client config
 - Deps: `SFE_SNOWDOCS_MCP_ACCESS_ROLE` granted USAGE on MCP server
 
 ## Change History

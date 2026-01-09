@@ -56,25 +56,6 @@ CREATE SCHEMA IF NOT EXISTS SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP
   COMMENT = 'DEMO: Snowflake MCP server objects (docs search). Author: SE Community. EXPIRES: 2026-02-07';
 
 /*******************************************************************************
- * PART 2: Custom Tool Functions
- ******************************************************************************/
-
-CREATE OR REPLACE FUNCTION SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.GET_ACCOUNT_INFO()
-RETURNS OBJECT
-LANGUAGE SQL
-COMMENT = 'DEMO: Returns Snowflake environment metadata (version, region, account name, etc.). EXPIRES: 2026-02-07'
-AS $$
-SELECT OBJECT_CONSTRUCT(
-  'version', CURRENT_VERSION(),
-  'region', CURRENT_REGION(),
-  'account_name', CURRENT_ACCOUNT_NAME(),
-  'organization', CURRENT_ORGANIZATION_NAME(),
-  'warehouse', CURRENT_WAREHOUSE(),
-  'role', CURRENT_ROLE(),
-  'user', CURRENT_USER())
-$$;
-
-/*******************************************************************************
  * PART 3: MCP Server
  ******************************************************************************/
 
@@ -113,8 +94,6 @@ GRANT USAGE ON MCP SERVER SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_SERV
 
 -- Documentation database is provided by Snowflake; this grants access to the underlying Cortex Search service.
 GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE_DOCUMENTATION TO ROLE SFE_SNOWDOCS_MCP_ACCESS_ROLE;
-
-GRANT USAGE ON FUNCTION SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.GET_ACCOUNT_INFO() TO ROLE SFE_SNOWDOCS_MCP_ACCESS_ROLE;
 
 -- Assign role to the current user for immediate testing.
 SET current_username = CURRENT_USER();

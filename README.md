@@ -18,7 +18,6 @@
 
 Deploys a Snowflake MCP server that gives your AI assistant:
 - **Documentation search** - Query Snowflake docs directly from your IDE
-- **Account info** - Check your Snowflake environment details
 - **Function finder** - Search for Snowflake functions by keyword
 
 ## Prerequisites
@@ -237,7 +236,6 @@ The `MCP_ACCESS_ROLE` has **minimal privileges**:
 | `SFE_SNOWDOCS_MCP_WH` | Warehouse used by the MCP server for tool execution |
 | `SNOWFLAKE_EXAMPLE` | Shared demo database (created if missing) |
 | `SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP` | Project schema namespace (collision-proof) |
-| `SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.GET_ACCOUNT_INFO()` | Custom tool: account info |
 | `SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_SERVER` | MCP server endpoint |
 | `SFE_SNOWDOCS_MCP_ACCESS_ROLE` | Minimal-privilege role granted USAGE on MCP server + supporting objects |
 | PAT Token (on current user) | Authentication token (365-day expiry by default) |

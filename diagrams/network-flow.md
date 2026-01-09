@@ -9,7 +9,7 @@ Status: Reference Implementation
 Reference Implementation: This code demonstrates production-grade architectural patterns and best practices. Review and customize security, networking, and logic for your organization's specific requirements before deployment.
 
 ## Overview
-This diagram shows the network path from an MCP client to Snowflake over HTTPS, and the internal Snowflake calls made by the MCP server tools (documentation search and custom function execution).
+This diagram shows the network path from an MCP client to Snowflake over HTTPS, and the internal Snowflake calls made by the MCP server tools (documentation search).
 
 ```mermaid
 graph TB
@@ -27,7 +27,6 @@ graph TB
     MCP[MCP Server Object<br/>SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP...]
     WH[Warehouse<br/>SFE_SNOWDOCS_MCP_WH]
     DocsSvc[Snowflake-managed Docs Search Service<br/>SNOWFLAKE_DOCUMENTATION...]
-    Fn[Custom SQL Function<br/>GET_ACCOUNT_INFO()]
   end
 
   IDE -->|Bearer token_secret<br/>HTTPS :443| Net
@@ -37,7 +36,6 @@ graph TB
 
   MCP -->|executes SQL on| WH
   MCP --> DocsSvc
-  MCP --> Fn
 ```
 
 ## Component Descriptions
@@ -54,7 +52,7 @@ graph TB
 - Purpose: Execution environment
 - Technology: Snowflake warehouse (`SFE_SNOWDOCS_MCP_WH`)
 - Location: Snowflake account
-- Deps: Granted to access role; used for custom tool execution
+- Deps: Granted to access role; used for tool execution
 
 - Purpose: Documentation search backend
 - Technology: Snowflake-managed `SNOWFLAKE_DOCUMENTATION` + Cortex Search service

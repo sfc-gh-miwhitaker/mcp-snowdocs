@@ -21,7 +21,7 @@ sequenceDiagram
   participant IDE as MCP Client
 
   User->>Snowsight: Run deploy_all.sql
-  Snowsight->>SF: USE ROLE ACCOUNTADMIN
+  Snowsight->>SF: USE ROLE SYSADMIN + SECURITYADMIN
   SF->>SF: CREATE ROLE / GRANT USAGE / GRANT IMPORTED PRIVILEGES
   SF->>SF: ALTER USER ... ADD PROGRAMMATIC ACCESS TOKEN
   SF-->>Snowsight: token_secret (shown once)
@@ -31,7 +31,7 @@ sequenceDiagram
   IDE->>SF: HTTPS request to MCP endpoint + Authorization: Bearer TOKEN_SECRET
   SF->>SF: Validate PAT token_secret
   SF->>SF: Resolve user + active role grants
-  SF->>Role: Enforce USAGE on MCP server + allowed functions
+  SF->>Role: Enforce USAGE on MCP server
   Role-->>SF: Authorized
   SF->>MCP: Execute tool request
   MCP-->>IDE: Tool response payload
@@ -46,7 +46,7 @@ sequenceDiagram
 - Purpose: Authorization boundary
 - Technology: Snowflake RBAC via `SFE_SNOWDOCS_MCP_ACCESS_ROLE`
 - Location: `deploy_all.sql` (PART 4)
-- Deps: Role must have USAGE on MCP server, warehouse, and custom function, plus imported privileges for `SNOWFLAKE_DOCUMENTATION`
+- Deps: Role must have USAGE on MCP server and warehouse, plus imported privileges for `SNOWFLAKE_DOCUMENTATION`
 
 - Purpose: Runtime enforcement
 - Technology: Snowflake API layer validating bearer token and evaluating grants

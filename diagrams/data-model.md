@@ -15,9 +15,7 @@ This diagram shows the Snowflake objects created by `deploy_all.sql` and how the
 erDiagram
   WAREHOUSE ||--o{ MCP_SERVER : "executes with"
   ROLE ||--o{ MCP_SERVER : "USAGE on"
-  ROLE ||--o{ FUNCTION_GET_ACCOUNT_INFO : "USAGE on"
   DATABASE_SNOWFLAKE_EXAMPLE ||--o{ SCHEMA_SNOWDOCS_MCP : contains
-  SCHEMA_SNOWDOCS_MCP ||--o{ FUNCTION_GET_ACCOUNT_INFO : contains
   SCHEMA_SNOWDOCS_MCP ||--o{ MCP_SERVER : contains
   USER ||--o{ PROGRAMMATIC_ACCESS_TOKEN : "auth secret"
   USER ||--o{ ROLE : "granted role"
@@ -38,17 +36,10 @@ erDiagram
     string purpose "project namespace"
   }
 
-  FUNCTION_GET_ACCOUNT_INFO {
-    string name "GET_ACCOUNT_INFO()"
-    string returns "OBJECT"
-    string language "SQL"
-  }
-
   MCP_SERVER {
     string name "SNOWFLAKE_DOCS_MCP_SERVER"
     string tool_1 "snowflake-docs-search"
     string tool_2 "snowflake-function-finder"
-    string tool_3 "get-account-info"
   }
 
   ROLE {
@@ -80,12 +71,12 @@ erDiagram
 - Purpose: MCP server endpoint
 - Technology: Snowflake `MCP SERVER` object exposing tools
 - Location: Created in `deploy_all.sql`
-- Deps: Uses Snowflake-managed Cortex Search service and a custom SQL function; executed on `SFE_SNOWDOCS_MCP_WH`
+- Deps: Uses Snowflake-managed Cortex Search service; executed on `SFE_SNOWDOCS_MCP_WH`
 
 - Purpose: Access role + token
 - Technology: Snowflake RBAC + Programmatic Access Token (PAT)
 - Location: Created/assigned in `deploy_all.sql`
-- Deps: `SFE_SNOWDOCS_MCP_ACCESS_ROLE` is granted USAGE on the MCP server + function; PAT is added to the current user
+- Deps: `SFE_SNOWDOCS_MCP_ACCESS_ROLE` is granted USAGE on the MCP server; PAT is added to the current user
 
 ## Change History
 See `.cursor/DIAGRAM_CHANGELOG.md` for vhistory.

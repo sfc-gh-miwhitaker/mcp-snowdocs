@@ -92,18 +92,6 @@ CREATE OR REPLACE MCP SERVER SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_S
         identifier: "SNOWFLAKE_DOCUMENTATION.SHARED.CKE_SNOWFLAKE_DOCS_SERVICE"
         description: "Search Snowflake documentation for built-in functions and usage examples by keyword"
         title: "Snowflake Function Finder"
-
-      - name: "get-account-info"
-        type: "CUSTOM"
-        identifier: "SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.GET_ACCOUNT_INFO"
-        description: "Returns current Snowflake account environment information"
-        title: "Snowflake Account Info"
-        config:
-          type: "function"
-          warehouse: "SFE_SNOWDOCS_MCP_WH"
-          input_schema:
-            type: "object"
-            properties: {}
   $$;
 
 /*******************************************************************************

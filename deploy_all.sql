@@ -34,7 +34,9 @@ $$;
  * PART 1: Context + Infrastructure
  ******************************************************************************/
 
-USE ROLE ACCOUNTADMIN;
+-- Best practice: never create objects as ACCOUNTADMIN.
+-- Use SYSADMIN for warehouses + database objects, and SECURITYADMIN for RBAC (roles/grants).
+USE ROLE SYSADMIN;
 
 CREATE WAREHOUSE IF NOT EXISTS SFE_SNOWDOCS_MCP_WH
   WAREHOUSE_SIZE = 'XSMALL'
@@ -108,6 +110,8 @@ CREATE OR REPLACE MCP SERVER SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_S
  * PART 4: Minimal-Privilege Access Role
  ******************************************************************************/
 
+USE ROLE SECURITYADMIN;
+
 CREATE ROLE IF NOT EXISTS SFE_SNOWDOCS_MCP_ACCESS_ROLE
   COMMENT = 'DEMO: Minimal privileges for Snowflake MCP server API access. Author: SE Community. EXPIRES: 2026-02-07';
 
@@ -173,4 +177,3 @@ SHOW MCP SERVERS IN SCHEMA SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP;
 SHOW ROLES LIKE 'SFE_SNOWDOCS_MCP_ACCESS_ROLE';
 DESC MCP SERVER SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP.SNOWFLAKE_DOCS_MCP_SERVER;
 */
-

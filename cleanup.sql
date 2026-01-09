@@ -10,7 +10,9 @@
  * ESTIMATED RUNTIME: ~1 minute
  ******************************************************************************/
 
-USE ROLE ACCOUNTADMIN;
+-- Best practice: never create/drop objects as ACCOUNTADMIN.
+-- Use SYSADMIN for database objects + warehouse ownership, and SECURITYADMIN for RBAC objects (roles/grants).
+USE ROLE SYSADMIN;
 
 /*******************************************************************************
  * PART 1: Drop schema-scoped objects (MCP server, functions, etc.)
@@ -27,7 +29,12 @@ DROP SCHEMA IF EXISTS SNOWFLAKE_EXAMPLE.SNOWDOCS_MCP CASCADE;
  * PART 2: Drop account-level demo objects (warehouse + role)
  ******************************************************************************/
 
+-- Role management is owned by SECURITYADMIN (RBAC boundary).
+USE ROLE SECURITYADMIN;
 DROP ROLE IF EXISTS SFE_SNOWDOCS_MCP_ACCESS_ROLE;
+
+-- Warehouse ownership is typically under SYSADMIN.
+USE ROLE SYSADMIN;
 DROP WAREHOUSE IF EXISTS SFE_SNOWDOCS_MCP_WH;
 
 /*******************************************************************************
@@ -48,5 +55,3 @@ SHOW USER PROGRAMMATIC ACCESS TOKENS;
 -- ALTER USER CURRENT_USER() DROP PROGRAMMATIC ACCESS TOKEN 'MCP_PAT_20260108_123456';
 -- ALTER USER CURRENT_USER() DROP ALL PROGRAMMATIC ACCESS TOKENS;
 */
-
-

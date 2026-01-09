@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: read
       issues: write
-      administration: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,8 +95,6 @@ jobs:
       - name: Archive repository when expired (best effort)
         if: steps.check.outputs.status == 'expired'
         uses: actions/github-script@v7
-        env:
-          MASTER_PAT: ${{ secrets.MASTER_PAT }}
         with:
           github-token: ${{ secrets.MASTER_PAT || github.token }}
           script: |

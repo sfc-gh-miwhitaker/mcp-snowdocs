@@ -4,12 +4,12 @@
 
 # Snowflake MCP Server Setup
 
-> DEMONSTRATION PROJECT - EXPIRES: 2026-02-07  
-> This demo uses Snowflake features current as of January 2026.  
+> DEMONSTRATION PROJECT - EXPIRES: 2026-02-07
+> This demo uses Snowflake features current as of January 2026.
 > After expiration, this repository should be archived and made private.
 
-**Author:** SE Community  
-**Purpose:** Reference implementation for a Snowflake-managed MCP server that enables Snowflake documentation search from MCP clients  
+**Author:** SE Community
+**Purpose:** Reference implementation for a Snowflake-managed MCP server that enables Snowflake documentation search from MCP clients
 **Created:** 2026-01-08 | **Expires:** 2026-02-07 (30 days) | **Status:** ACTIVE
 
 ---
@@ -180,7 +180,7 @@ This will:
 
 This is a known issue with some MCP clients. **Solution:**
 
-Create a simple Node.js proxy that handles SSE headers correctly. See [mcp-snowflake-proxy](https://github.com/sfc-gh-miwhitaker/mcp-snowflake-proxy) for a ready-to-use solution (separate repository).
+Create a simple Node.js proxy that handles SSE headers correctly (separate repository). Search for "mcp snowflake proxy" to find a ready-to-use reference implementation.
 
 ### Error: HTTP 401 Authorization Failed
 
@@ -260,9 +260,9 @@ Apache License 2.0 - See [LICENSE](./LICENSE)
 
 ## Summary
 
-**Deploy:** Run `deploy.sql` in Snowsight → Copy URL + Token  
-**Configure:** Add to your IDE config file → Restart IDE  
-**Test:** Ask Snowflake questions in your AI assistant  
+**Deploy:** Run `deploy.sql` in Snowsight → Copy URL + Token
+**Configure:** Add to your IDE config file → Restart IDE
+**Test:** Ask Snowflake questions in your AI assistant
 **Cleanup:** Run `cleanup.sql` when done
 
 **Total setup time:** ~5 minutes
